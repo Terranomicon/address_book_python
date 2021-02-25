@@ -1,5 +1,7 @@
 # from app.repositories.Repository import Repository
-from app import database
+# from app import database
+from flask import jsonify
+import database
 
 dbconn = database.get_connection()
 
@@ -16,7 +18,19 @@ class User:
         my_list = []
         for row in rows:
             my_list.append(row)
-        return my_list
+        return jsonify(my_list)
+
+    @classmethod
+    def get_user_by_id(cls, id):
+        query = """SELECT * FROM users WHERE id = """ + id
+        cur = dbconn.cursor()
+        cur.execute(query)
+        rows = cur.fetchall()
+        response = ''
+        my_list = []
+        for row in rows:
+            my_list.append(row)
+        return jsonify(my_list)
 #
 # @classmethod
 #     def create(full_name: str):

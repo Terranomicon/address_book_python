@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 import controllers.UserController
 
 app = Flask(__name__)
@@ -6,12 +7,18 @@ app = Flask(__name__)
 
 @app.route('/users', methods=['POST'])
 def get_users():
-    controllers.UserController.UserController.get_users()
+    if request.form:
+        id = request.form['id']
+        return controllers.UserController.UserController.get_user_by_id(id)
+    else:
+        return controllers.UserController.UserController.get_all_users()
 
 
-# @app.route('/users/<id>', methods=['POST'])
-# def get_user_by_id(id: int):
-#     UserController.get_user_by_id(id)
+
+# @app.route('/users', methods=['POST'])
+# def get_user_by_id():
+#     gg = request.form['id']
+#     return controllers.UserController.UserController.get_user_by_id(gg)
 
 
 # @app.route('/users', methods=['PUT'])
