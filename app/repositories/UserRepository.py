@@ -31,35 +31,26 @@ class User:
 
     @classmethod
     def create_user(cls, data):
-        try:
-            query = """ INSERT INTO users (full_name, birthdate, address, gender) VALUES (%s,%s,%s,%s)"""
-            record_to_insert = (data['full_name'], data['birthdate'], data['address'], data['gender'])
-            cur = dbconn.cursor()
-            cur.execute(query, record_to_insert)
-            dbconn.commit()
-            cur.close()
-        except psycopg2.Error as error:
-            pass  # логи
+        query = """ INSERT INTO users (full_name, birthdate, address, gender) VALUES (%s,%s,%s,%s)"""
+        record_to_insert = (data['full_name'], data['birthdate'], data['address'], data['gender'])
+        cur = dbconn.cursor()
+        cur.execute(query, record_to_insert)
+        dbconn.commit()
+        cur.close()
 
     @classmethod
     def update_user(cls, data):
-        try:
-            query = """ Update users set full_name = %s, birthdate = %s, address = %s ,gender = %s  where id = %s"""
-            record_to_insert = (data['full_name'], data['birthdate'], data['address'], data['gender'], data['id'])
-            cur = dbconn.cursor()
-            cur.execute(query, record_to_insert)
-            dbconn.commit()
-            cur.close()
-        except psycopg2.Error as error:
-            print("Error in update operation", error)  # логи
+        query = """ Update users set full_name = %s, birthdate = %s, address = %s ,gender = %s  where id = %s"""
+        record_to_insert = (data['full_name'], data['birthdate'], data['address'], data['gender'], data['id'])
+        cur = dbconn.cursor()
+        cur.execute(query, record_to_insert)
+        dbconn.commit()
+        cur.close()
 
     @classmethod
     def delete_user(cls, data):
-        try:
-            query = """ Delete from users where id = %s"""
-            cur = dbconn.cursor()
-            cur.execute(query, (data,))
-            dbconn.commit()
-            cur.close()
-        except psycopg2.Error as error:
-            print("Error in update operation", error)  # логи
+        query = """ Delete from users where id = %s"""
+        cur = dbconn.cursor()
+        cur.execute(query, (data,))
+        dbconn.commit()
+        cur.close()

@@ -4,8 +4,6 @@ import controllers.UserController
 import controllers.PhoneController
 import controllers.EmailController
 
-# import controllers.UserController
-
 app = Flask(__name__)
 
 

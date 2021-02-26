@@ -2,6 +2,7 @@ from flask import jsonify
 from repositories.EmailRepository import Email
 
 from .Controller import Controller as Con
+from Logger import logger
 
 
 class EmailController:
@@ -34,8 +35,13 @@ class EmailController:
         email = Email.get_email_by_id(data.get('user_id'))
         if email:
             return Con.response({'error': 'Email exist'}, 400)
-        Email.create_email(data)
-        return Con.response({'OK': '200'}, 200)
+        try:
+            Email.create_email(data)
+            logger.info('create object %s', data)
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error creating %s', error)
+            return Con.response({'Error': '500'}, 500)
 
     @classmethod
     def update_email(cls, data):
@@ -58,15 +64,20 @@ class EmailController:
             new_email_data['type'] = email[0][1]
 
         if data.get('email') is not None:
-            if data.get('email') == '':  # добавить валидацию даты
+            if data.get('email') == '':
                 return Con.response({'error': 'Invalid parameters. Number must not be empty'}, 400)
             else:
                 new_email_data['email'] = data.get('email')
         else:
             new_email_data['email'] = email[0][2]
 
-        Email.update_email(new_email_data)
-        return Con.response({'OK': '200'}, 200)
+        try:
+            Email.update_email(new_email_data)
+            logger.info('update object with new data %s', new_email_data)
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error updating %s', error)
+            return Con.response({'Error': '500'}, 500)
 
     @classmethod
     def delete_email(cls, data):
@@ -76,6 +87,9 @@ class EmailController:
         email = Email.get_email_by_id(data.get('user_id'))
         if not email:
             return Con.response({'error': 'Email not found'}, 400)
-
-        Email.delete_email(data.get('user_id'))
-        return Con.response({'OK': '200'}, 200)
+        try:
+            Email.delete_email(data.get('user_id'))
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error delete %s', error)
+            return Con.response({'Error': '500'}, 500)

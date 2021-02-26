@@ -2,6 +2,7 @@ from flask import jsonify
 from repositories.PhoneRepository import Phone
 
 from .Controller import Controller as Con
+from Logger import logger
 
 
 class PhoneController:
@@ -34,8 +35,13 @@ class PhoneController:
         phone = Phone.get_phone_by_id(data.get('user_id'))
         if phone:
             return Con.response({'error': 'Phone exist'}, 400)
-        Phone.create_phone(data)
-        return Con.response({'OK': '200'}, 200)
+        try:
+            Phone.create_phone(data)
+            logger.info('create object %s', data)
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error creating %s', error)
+            return Con.response({'Error': '500'}, 500)
 
     @classmethod
     def update_phone(cls, data):
@@ -58,15 +64,19 @@ class PhoneController:
             new_phone_data['number_type'] = phone[0][1]
 
         if data.get('number') is not None:
-            if data.get('number') == '':  # добавить валидацию даты
+            if data.get('number') == '':
                 return Con.response({'error': 'Invalid parameters. Number must not be empty'}, 400)
             else:
                 new_phone_data['number'] = data.get('number')
         else:
             new_phone_data['number'] = phone[0][2]
-
-        Phone.update_phone(new_phone_data)
-        return Con.response({'OK': '200'}, 200)
+        try:
+            Phone.update_phone(new_phone_data)
+            logger.info('update object with new data %s', new_phone_data)
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error updating %s', error)
+            return Con.response({'Error': '500'}, 500)
 
     @classmethod
     def delete_phone(cls, data):
@@ -76,6 +86,9 @@ class PhoneController:
         phone = Phone.get_phone_by_id(data.get('user_id'))
         if not phone:
             return Con.response({'error': 'Phone not found'}, 400)
-
-        Phone.delete_phone(data.get('user_id'))
-        return Con.response({'OK': '200'}, 200)
+        try:
+            Phone.delete_phone(data.get('user_id'))
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error delete %s', error)
+            return Con.response({'Error': '500'}, 500)

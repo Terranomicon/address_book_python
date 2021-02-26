@@ -2,6 +2,7 @@ from flask import jsonify
 from repositories.UserRepository import User
 
 from .Controller import Controller as Con
+from Logger import logger
 
 
 class UserController:
@@ -25,17 +26,19 @@ class UserController:
         if data.get('birthdate') == '' or data.get('birthdate') is None:
             return Con.response({'error': 'Birthdate required'}, 400)
 
-        # if not valid_date(data.get('birthdate')): #сделать
-        #     return Con.response({'error': 'Incorrect date'}, 400)
-        # test = get_date(data.get('birthdate'))
-
         if data.get('address') == '' or data.get('address') is None:
             return Con.response({'error': 'Address required'}, 400)
 
         if data.get('gender') == '' or data.get('gender') is None:
             return Con.response({'error': 'Gender required'}, 400)
-        User.create_user(data)
-        return Con.response({'OK': '200'}, 200)
+
+        try:
+            User.create_user(data)
+            logger.info('create object %s', data)
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error creating %s', error)
+            return Con.response({'Error': '500'}, 500)
 
     @classmethod
     def update_user(cls, data):
@@ -58,7 +61,7 @@ class UserController:
             new_user_data['full_name'] = user[0][0]
 
         if data.get('birthdate') is not None:
-            if data.get('birthdate') == '':  # добавить валидацию даты
+            if data.get('birthdate') == '':
                 return Con.response({'error': 'Invalid parameters. Birthdate must not be empty'}, 400)
             else:
                 new_user_data['birthdate'] = data.get('birthdate')
@@ -80,9 +83,13 @@ class UserController:
                 new_user_data['gender'] = data.get('gender')
         else:
             new_user_data['gender'] = user[0][3]
-
-        User.update_user(new_user_data)
-        return Con.response({'OK': '200'}, 200)
+        try:
+            User.update_user(new_user_data)
+            logger.info('update object with new data %s', new_user_data)
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error updating %s', error)
+            return Con.response({'Error': '500'}, 500)
 
     @classmethod
     def delete_user(cls, data):
@@ -92,6 +99,9 @@ class UserController:
         user = User.get_user_by_id(data.get('id'))
         if not user:
             return Con.response({'error': 'User not found'}, 400)
-
-        User.delete_user(data.get('id'))
-        return Con.response({'OK': '200'}, 200)
+        try:
+            User.delete_user(data.get('id'))
+            return Con.response({'OK': '200'}, 200)
+        except Exception as error:
+            logger.error('error delete %s', error)
+            return Con.response({'Error': '500'}, 500)
