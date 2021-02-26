@@ -1,8 +1,9 @@
-import json
-
-from flask import Flask, Response, jsonify
+from flask import Flask
 from flask import request
 import controllers.UserController
+import controllers.PhoneController
+
+# import controllers.UserController
 
 app = Flask(__name__)
 
@@ -11,7 +12,7 @@ app = Flask(__name__)
 def get_users():
     if request.form:
         id = request.form['id']
-        return jsonify(controllers.UserController.UserController.get_user_by_id(id))
+        return controllers.UserController.UserController.get_user_by_id(id)
     else:
         return controllers.UserController.UserController.get_all_users()
 
@@ -32,6 +33,33 @@ def update_user():
 def delete_user():
     data = request.args
     return controllers.UserController.UserController.delete_user(data)
+
+
+@app.route('/phone', methods=['POST'])
+def get_phones():
+    if request.form:
+        user_id = request.form['user_id']
+        return controllers.PhoneController.PhoneController.get_phone_by_id(user_id)
+    else:
+        return controllers.PhoneController.PhoneController.get_all_phones()
+
+
+@app.route('/phone', methods=['PUT'])
+def create_phone():
+    data = request.args
+    return controllers.PhoneController.PhoneController.create_phone(data)
+
+
+@app.route('/phone', methods=['PATCH'])
+def update_phone():
+    data = request.args
+    return controllers.PhoneController.PhoneController.update_phone(data)
+
+
+@app.route('/phone', methods=['DELETE'])
+def delete_phone():
+    data = request.args
+    return controllers.PhoneController.PhoneController.delete_phone(data)
 
 
 if __name__ == '__main__':

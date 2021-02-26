@@ -1,3 +1,4 @@
+from flask import jsonify
 from repositories.UserRepository import User
 
 from .Controller import Controller as Con
@@ -14,7 +15,7 @@ class UserController:
         if id == '':
             return Con.response({'error': 'id required'}, 400)
         else:
-            return User.get_user_by_id(id)
+            return jsonify(User.get_user_by_id(id))
 
     @classmethod
     def create_user(cls, data):
@@ -39,29 +40,6 @@ class UserController:
     @classmethod
     def update_user(cls, data):
         new_user_data = {}
-        if data.get('full_name') is not None:
-            if data.get('full_name') == '':
-                return Con.response({'error': 'Invalid parameters. Name must not be empty'}, 400)
-            else:
-                new_user_data['full_name'] = data.get('full_name')
-
-        if data.get('birthdate') is not None:
-            if data.get('birthdate') == '':  # добавить валидацию даты
-                return Con.response({'error': 'Invalid parameters. Birthdate must not be empty'}, 400)
-            else:
-                new_user_data['birthdate'] = data.get('birthdate')
-
-        if data.get('address') is not None:
-            if data.get('address') == '':
-                return Con.response({'error': 'Invalid parameters. Address must not be empty'}, 400)
-            else:
-                new_user_data['address'] = data.get('address')
-
-        if data.get('gender') is not None:
-            if data.get('gender') == '':
-                return Con.response({'error': 'Invalid parameters. Gender must not be empty'}, 400)
-            else:
-                new_user_data['gender'] = data.get('gender')
         if data.get('id') == '' or data.get('id') is None:
             return Con.response({'error': 'Invalid parameters. Id required'}, 400)
 
@@ -70,6 +48,39 @@ class UserController:
             return Con.response({'error': 'User not found'}, 400)
         else:
             new_user_data['id'] = data.get('id')
+
+        if data.get('full_name') is not None:
+            if data.get('full_name') == '':
+                return Con.response({'error': 'Invalid parameters. Name must not be empty'}, 400)
+            else:
+                new_user_data['full_name'] = data.get('full_name')
+        else:
+            new_user_data['full_name'] = user[0][0]
+
+        if data.get('birthdate') is not None:
+            if data.get('birthdate') == '':  # добавить валидацию даты
+                return Con.response({'error': 'Invalid parameters. Birthdate must not be empty'}, 400)
+            else:
+                new_user_data['birthdate'] = data.get('birthdate')
+        else:
+            new_user_data['birthdate'] = user[0][1]
+
+        if data.get('address') is not None:
+            if data.get('address') == '':
+                return Con.response({'error': 'Invalid parameters. Address must not be empty'}, 400)
+            else:
+                new_user_data['address'] = data.get('address')
+        else:
+            new_user_data['address'] = user[0][2]
+
+        if data.get('gender') is not None:
+            if data.get('gender') == '':
+                return Con.response({'error': 'Invalid parameters. Gender must not be empty'}, 400)
+            else:
+                new_user_data['gender'] = data.get('gender')
+        else:
+            new_user_data['gender'] = user[0][3]
+
         User.update_user(new_user_data)
         return Con.response({'OK': '200'}, 200)
 
