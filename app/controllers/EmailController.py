@@ -1,4 +1,5 @@
 from flask import jsonify
+import re
 from repositories.EmailRepository import Email
 
 from .Controller import Controller as Con
@@ -28,6 +29,9 @@ class EmailController:
 
         if data.get('email') == '' or data.get('email') is None:
             return Con.response({'error': 'Email required'}, 400)
+
+        if not valid_email(data.get('email')):
+            return Con.response({'error': 'Email not valid'}, 400)
 
         if data.get('user_id') == '' or data.get('user_id') is None:
             return Con.response({'error': 'Invalid parameters. User id required'}, 400)
@@ -66,8 +70,10 @@ class EmailController:
         if data.get('email') is not None:
             if data.get('email') == '':
                 return Con.response({'error': 'Invalid parameters. Number must not be empty'}, 400)
-            else:
-                new_email_data['email'] = data.get('email')
+
+            if not valid_email(data.get('email')):
+                return Con.response({'error': 'Email not valid'}, 400)
+            new_email_data['email'] = data.get('email')
         else:
             new_email_data['email'] = email[0][2]
 
@@ -93,3 +99,7 @@ class EmailController:
         except Exception as error:
             logger.error('error delete %s', error)
             return Con.response({'Error': '500'}, 500)
+
+
+def valid_email(email):
+    return bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", email))

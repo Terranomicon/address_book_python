@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from flask import jsonify
+import time
 from repositories.UserRepository import User
 
 from .Controller import Controller as Con
@@ -25,6 +28,9 @@ class UserController:
 
         if data.get('birthdate') == '' or data.get('birthdate') is None:
             return Con.response({'error': 'Birthdate required'}, 400)
+
+        if not is_date_valid(data.get('birthdate')):
+            return Con.response({'error': 'Birthdate not valid'}, 400)
 
         if data.get('address') == '' or data.get('address') is None:
             return Con.response({'error': 'Address required'}, 400)
@@ -63,8 +69,10 @@ class UserController:
         if data.get('birthdate') is not None:
             if data.get('birthdate') == '':
                 return Con.response({'error': 'Invalid parameters. Birthdate must not be empty'}, 400)
-            else:
-                new_user_data['birthdate'] = data.get('birthdate')
+
+            if not is_date_valid(data.get('birthdate')):
+                return Con.response({'error': 'Birthdate not valid'}, 400)
+            new_user_data['birthdate'] = data.get('birthdate')
         else:
             new_user_data['birthdate'] = user[0][1]
 
@@ -105,3 +113,12 @@ class UserController:
         except Exception as error:
             logger.error('error delete %s', error)
             return Con.response({'Error': '500'}, 500)
+
+
+def is_date_valid(date_text):
+    try:
+        if date_text != datetime.strptime(date_text, "%Y-%m-%d").strftime('%Y-%m-%d'):
+            raise ValueError
+        return True
+    except ValueError:
+        return False
