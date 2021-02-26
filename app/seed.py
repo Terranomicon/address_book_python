@@ -10,36 +10,28 @@ genderTypes = ['Мужчина', 'Женщина']
 emailTypes = ['Личный', 'Рабочий']
 phoneTypes = ['Городской', 'Мобильный']
 
-user = {}
-email = {}
-phone = {}
+user_data, phone_data, email_data = [], [], []
 
 for _ in range(50):
-    user['full_name'] = fake.name()
-    user['birthdate'] = fake.date_of_birth(minimum_age=10)
-    user['address'] = fake.address()
-    user['gender'] = random.choice(genderTypes)
-    cur = dbconn.cursor()
-    postgres_insert_query = """ INSERT INTO users (full_name, birthdate, address, gender) VALUES (%s,%s,%s,%s)"""
-    record_to_insert = (user['full_name'], user['birthdate'], user['address'], user['gender'])
-    cur.execute(postgres_insert_query, record_to_insert)
-    dbconn.commit()
-    print("Record inserted successfully")
+    user_tuple = (fake.name(), fake.date_of_birth(minimum_age=10), fake.address(), random.choice(genderTypes))
+    user_data.append(user_tuple)
 
-    email['user_id'] = _ + 1
-    email['type'] = random.choice(emailTypes)
-    email['email'] = fake.email()
-    postgres_insert_query = """ INSERT INTO email (user_id, type, email) VALUES (%s,%s,%s)"""
-    record_to_insert = (email['user_id'], email['type'], email['email'])
-    cur.execute(postgres_insert_query, record_to_insert)
-    dbconn.commit()
+    email_tuple = (_ + 1, random.choice(emailTypes), fake.email())
+    email_data.append(email_tuple)
 
-    phone['user_id'] = _ + 1
-    phone['number_type'] = random.choice(phoneTypes)
-    phone['number'] = fake.phone_number()
-    postgres_insert_query = """ INSERT INTO phone_number (user_id, number_type, number) VALUES (%s,%s,%s)"""
-    record_to_insert = (phone['user_id'], phone['number_type'], phone['number'])
-    cur.execute(postgres_insert_query, record_to_insert)
-    dbconn.commit()
+    phone_tuple = (_ + 1, random.choice(phoneTypes), fake.phone_number())
+    phone_data.append(phone_tuple)
 
+cur = dbconn.cursor()
+user_insert_query = """ INSERT INTO users (full_name, birthdate, address, gender) VALUES (%s,%s,%s,%s)"""
+cur.executemany(user_insert_query, user_data)
+
+email_insert_query = """ INSERT INTO email (user_id, type, email) VALUES (%s,%s,%s)"""
+cur.executemany(email_insert_query, email_data)
+
+phone_insert_query = """ INSERT INTO phone_number (user_id, number_type, number) VALUES (%s,%s,%s)"""
+cur.executemany(phone_insert_query, phone_data)
+
+dbconn.commit()
+print("All data inserted successfully")
 dbconn.close()
