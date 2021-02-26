@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 import controllers.UserController
 import controllers.PhoneController
+import controllers.EmailController
 
 # import controllers.UserController
 
@@ -60,6 +61,33 @@ def update_phone():
 def delete_phone():
     data = request.args
     return controllers.PhoneController.PhoneController.delete_phone(data)
+
+
+@app.route('/email', methods=['POST'])
+def get_emails():
+    if request.form:
+        user_id = request.form['user_id']
+        return controllers.EmailController.EmailController.get_email_by_id(user_id)
+    else:
+        return controllers.EmailController.EmailController.get_all_emails()
+
+
+@app.route('/email', methods=['PUT'])
+def create_email():
+    data = request.args
+    return controllers.EmailController.EmailController.create_email(data)
+
+
+@app.route('/email', methods=['PATCH'])
+def update_email():
+    data = request.args
+    return controllers.EmailController.EmailController.update_email(data)
+
+
+@app.route('/email', methods=['DELETE'])
+def delete_email():
+    data = request.args
+    return controllers.EmailController.EmailController.delete_email(data)
 
 
 if __name__ == '__main__':
